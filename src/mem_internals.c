@@ -11,22 +11,109 @@
 #include "mem_internals.h"
 #include <bits/mman-linux.h>
 
+const unsigned int SIZE_MARKER_LENGTH = 8;
+const unsigned int MAGIC_NUMBER_LENGTH = 8;
+
 unsigned long knuth_mmix_one_round(unsigned long in)
 {
     return in * 6364136223846793005UL % 1442695040888963407UL;
 }
 
+
+/*
+** ptr: Points to the WHOLE memory block beginning (including marks)
+** size: Memory block size expressed on number of bytes:
+        Required memory + Unused + 4 * 8bytes (2 size marks, 2 magic number, each one 1 byte long)
+** k: Large, Medium or Small memory slot kind.
+
+** Returns the marked block pointer
+*/
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
+    unsigned long magic_number, memory_kind;
+    char *whole_memory_area_ptr = ptr; // Por cada aumento en unidad, se mueve en un octeto de memoria
 
-    /* ecrire votre code ici */
-    return (void *)0;
+    char *first_size_marker_ptr = ptr;
+    char *first_magic_number_ptr = ptr + SIZE_MARKER_LENGTH;
+    char *last_magic_number_ptr = ptr + (size - SIZE_MARKER_LENGTH - MAGIC_NUMBER_LENGTH);
+    char *last_size_marker_ptr = ptr + (size - SIZE_MARKER_LENGTH);
+
+    magic_number = knuth_mmix_one_round((unsigned long)ptr);
+
+    switch (k)
+    {
+    case SMALL_KIND:
+        memory_kind = 0;
+        break;
+    case MEDIUM_KIND:
+        memory_kind = 1;
+        break;
+    case LARGE_KIND:
+        memory_kind = 2;
+        break;
+    default:
+        break;
+    }
+
+    magic_number = (magic_number & ~(0b11UL)) | (memory_kind);
+
+    *(unsigned long *)first_size_marker_ptr = size;
+    *(unsigned long *)first_magic_number_ptr = magic_number;
+    *(unsigned long *)last_magic_number_ptr = magic_number;
+    *(unsigned long *)last_size_marker_ptr = size;
+
+    return whole_memory_area_ptr + SIZE_MARKER_LENGTH + MAGIC_NUMBER_LENGTH;
 }
 
+/* 
+    Verifies that the marks put on a memory block didn't suffer
+    alterations, as well as comparing the marks
+    between them
+ */
 Alloc mark_check_and_get_alloc(void *ptr)
 {
-    /* ecrire votre code ici */
-    Alloc a = {};
+
+    char *memory_zone_start_ptr = ptr - SIZE_MARKER_LENGTH - MAGIC_NUMBER_LENGTH;
+    char *first_size_mark_ptr = memory_zone_start_ptr; // déplacement d'un octet par chaque +1/-1
+    char *first_magic_number_ptr = memory_zone_start_ptr + SIZE_MARKER_LENGTH;
+    char *last_magic_number_ptr;
+    char *last_size_mark_ptr;
+
+    unsigned long memory_kind, first_size_marker, last_size_marker, first_magic_num, last_magic_num;
+    MemKind kind;
+
+    first_size_marker = *(unsigned long *)first_size_mark_ptr;
+    first_magic_num = *(unsigned long *)first_magic_number_ptr;
+
+    last_magic_number_ptr = memory_zone_start_ptr + first_size_marker - SIZE_MARKER_LENGTH - MAGIC_NUMBER_LENGTH;
+    last_size_mark_ptr = memory_zone_start_ptr + first_size_marker - SIZE_MARKER_LENGTH;
+
+
+    last_magic_num = *(unsigned long *)last_magic_number_ptr;
+    last_size_marker = *(unsigned long *)last_size_mark_ptr;
+
+
+    assert(first_magic_num == last_magic_num);
+    assert(first_size_marker == last_size_marker);
+
+    memory_kind = first_magic_num & (0b11UL);
+
+    switch (memory_kind)
+    {
+    case 0:
+        kind = SMALL_KIND;
+        break;
+    case 1:
+        kind = MEDIUM_KIND;
+        break;
+    case 2:
+        kind = LARGE_KIND;
+        break;
+    default:
+        break;
+    }
+
+    Alloc a = {(void *)memory_zone_start_ptr, kind, first_size_marker}; // on reenvoi le pointeur au debut de la zone alloqué
     return a;
 }
 

@@ -16,7 +16,7 @@ set(VARIANTE_LOGINS login1 login2 login3)
 ###
 
 list(SORT VARIANTE_LOGINS)
-if (VARIANTE_LOGINS MATCHES "login[123]")
+if (VARIANTE_LOGINS MATCHES "duartejj99")
   message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre vos logins")
 endif()
 
