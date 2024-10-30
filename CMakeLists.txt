@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -std=gnu++14")
 #########
 # Vous devez editer la ligne suivante pour y mettre vos logins
 #########
-set(VARIANTE_LOGINS login1 login2 login3)
+set(VARIANTE_LOGINS duartejj fleon)
 ###
 
 list(SORT VARIANTE_LOGINS)
@@ -48,7 +48,9 @@ endif(EXISTS /usr/src/gtest)
 ##
 # Recherche du répertoire avec les headers python
 ##
-if(EXISTS /usr/include/python3.6m/Python.h)
+if(EXISTS /usr/include/python3.12/Python.h)
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.12")
+elseif(EXISTS /usr/include/python3.6m/Python.h)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.6m")
 else(EXISTS /usr/include/python3.6m/Python.h)
   if (EXISTS /usr/include/python3.8/Python.h)

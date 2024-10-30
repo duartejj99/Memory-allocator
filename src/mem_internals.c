@@ -7,7 +7,6 @@
 #include <sys/mman.h>
 #include <assert.h>
 #include <stdint.h>
-#include "mem.h"
 #include "mem_internals.h"
 #include <bits/mman-linux.h>
 
@@ -16,11 +15,32 @@ unsigned long knuth_mmix_one_round(unsigned long in)
     return in * 6364136223846793005UL % 1442695040888963407UL;
 }
 
+// unsigned long calculate_magic_number(unsigned long )
+
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
 
-    /* ecrire votre code ici */
-    return (void *)0;
+    // ->[SIZE][MAGIC NUM]-- [USER MEMORY]--[MAGIC NUM][SIZE]
+    //
+    char *size_mark_ptr;
+    void *detonacion;
+    unsigned long magic_number = knuth_mmix_one_round((unsigned long) ptr);
+    *(unsigned long *)ptr = size;
+    *((unsigned long *)ptr + 1) = magic_number;
+    *((char *)ptr + size - 1) = size;
+    *((char *)ptr + size - 2) = magic_number;
+
+    detonacion = (void *) 0x1000;
+    int *int_pointer = (int *)detonacion + 1;
+    long *long_pointer = (long *)detonacion + 1;
+    printf("int_pointer : %p\n", int_pointer);
+    printf("long_pointer : %p\n", long_pointer);
+
+    size_mark_ptr = ptr + size - 8;
+    printf("this is the initial size: %lu\n", size);
+    printf("this is the size in memory: %lu\n", *(unsigned long *)size_mark_ptr);
+
+    return (void *)((unsigned long *)ptr + 2);
 }
 
 Alloc mark_check_and_get_alloc(void *ptr)
