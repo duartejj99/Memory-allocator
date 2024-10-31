@@ -30,12 +30,6 @@ void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
     *((char *)ptr + size - 1) = size;
     *((char *)ptr + size - 2) = magic_number;
 
-    detonacion = (void *) 0x1000;
-    int *int_pointer = (int *)detonacion + 1;
-    long *long_pointer = (long *)detonacion + 1;
-    printf("int_pointer : %p\n", int_pointer);
-    printf("long_pointer : %p\n", long_pointer);
-
     size_mark_ptr = ptr + size - 8;
     printf("this is the initial size: %lu\n", size);
     printf("this is the size in memory: %lu\n", *(unsigned long *)size_mark_ptr);
