@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -std=gnu++14")
 #########
 # Vous devez editer la ligne suivante pour y mettre vos logins
 #########
-set(VARIANTE_LOGINS login1 login2 login3)
+set(VARIANTE_LOGINS garciarc garciadj)
 ###
 
 list(SORT VARIANTE_LOGINS)
