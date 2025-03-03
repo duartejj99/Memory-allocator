@@ -19,20 +19,15 @@ unsigned long knuth_mmix_one_round(unsigned long in)
 
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
-
     // ->[SIZE][MAGIC NUM]-- [USER MEMORY]--[MAGIC NUM][SIZE]
-    //
-    char *size_mark_ptr;
-    void *detonacion;
-    unsigned long magic_number = knuth_mmix_one_round((unsigned long) ptr);
+    //  8o 8o user mem 8o 8o
+    unsigned long mmix = knuth_mmix_one_round((unsigned long)ptr);
+    unsigned long magic_number = (mmix & ~(0b11UL)) | k;
+
     *(unsigned long *)ptr = size;
     *((unsigned long *)ptr + 1) = magic_number;
-    *((char *)ptr + size - 1) = size;
-    *((char *)ptr + size - 2) = magic_number;
-
-    size_mark_ptr = ptr + size - 8;
-    printf("this is the initial size: %lu\n", size);
-    printf("this is the size in memory: %lu\n", *(unsigned long *)size_mark_ptr);
+    *(unsigned long *)((char *)ptr + size - 8) = size;
+    *(unsigned long *)((char *)ptr + size - 16) = magic_number;
 
     return (void *)((unsigned long *)ptr + 2);
 }
@@ -93,4 +88,21 @@ nb_TZL_entries()
             nb++;
 
     return nb;
+}
+
+void pointer_info()
+{
+    printf("DATA TYPE TESTS \n");
+    printf("========================\n");
+
+    printf("char size: %li\n", sizeof(char));
+    printf("integer size: %li\n", sizeof(int));
+    printf("unsigned long integer size: %li\n", sizeof(unsigned long));
+
+    printf("char size pointer:  %li\n", sizeof(char *));
+    printf("integer size pointer: %li\n", sizeof(int *));
+    printf("unsigned long integer size pointer: %li\n", sizeof(unsigned long *));
+
+    printf("========================\n");
+    printf("DATA TYPE TESTS \n");
 }
