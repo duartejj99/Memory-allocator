@@ -34,8 +34,24 @@ void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 
 Alloc mark_check_and_get_alloc(void *ptr)
 {
-    /* ecrire votre code ici */
-    Alloc a = {};
+    void *block_ptr = ptr - 16;
+
+    unsigned long size = *(unsigned long *)block_ptr;
+    unsigned long magic_number = *(unsigned long *)(block_ptr + 8);
+
+    unsigned long size_2 = *(unsigned long *)(block_ptr + size - 8);
+    unsigned long magic_number_2 = *(unsigned long *)(block_ptr + size - 16);
+
+    assert(size == size_2);
+    assert(magic_number == magic_number_2);
+
+    MemKind mem_kind = magic_number & 0b11UL;
+
+    printf("Memory size: %lu\n", *(unsigned long *)block_ptr);
+    Alloc a = {
+        block_ptr,
+        mem_kind,
+        size};
     return a;
 }
 
