@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6...3.5)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
-
-project(emalloc)
+  endif(COMMAND cmake_policy)
+  
+cmake_policy(SET CMP0048 NEW)
+project(emalloc VERSION 2.0)
 enable_testing()
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror -std=gnu11")
@@ -12,7 +13,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror -std=gnu++14")
 #########
 # Vous devez editer la ligne suivante pour y mettre vos logins
 #########
-set(VARIANTE_LOGINS login1 login2 login3)
+set(VARIANTE_LOGINS duartejj fleon)
 ###
 
 list(SORT VARIANTE_LOGINS)
@@ -48,13 +49,15 @@ endif(EXISTS /usr/src/gtest)
 ##
 # Recherche du répertoire avec les headers python
 ##
-if(EXISTS /usr/include/python3.6m/Python.h)
+if(EXISTS /usr/include/python3.12/Python.h)
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.12")
+elseif(EXISTS /usr/include/python3.6m/Python.h)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.6m")
 else(EXISTS /usr/include/python3.6m/Python.h)
   if (EXISTS /usr/include/python3.8/Python.h)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.8")
   endif (EXISTS /usr/include/python3.8/Python.h)
-endif(EXISTS /usr/include/python3.6m/Python.h)
+endif(EXISTS /usr/include/python3.12/Python.h)
 
 ##
 # Si vous utilisé plusieurs fichiers, en plus de mem.c et les autres,
