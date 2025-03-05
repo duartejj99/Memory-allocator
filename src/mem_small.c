@@ -10,7 +10,7 @@
 #include "mem_internals.h"
 
 bool is_pool_empty(void *pool);
-void initialize_pool(void *pool);
+void initialize_pool();
 void *poll(void *head);
 
 void *
@@ -45,15 +45,21 @@ void efree_small(Alloc a)
     assert("Not yet implemented :(");
 }
 
-/**
- * Initialize the given memory pool of size @pool_size
- * as a linked list
- */
-void initialize_pool(void *pool)
+/// @brief Initialize a memory pool, transforming it into a linked list
+/// which head pointed by the arena.chunkpool pointer
+void initialize_pool()
 {
-    // unsigned long pool_size = mem_realloc_small();
 
-    assert("Not yet implemented :(");
+    unsigned long pool_size_in_bytes = mem_realloc_small();
+    assert(pool_size_in_bytes % CHUNKSIZE == 0);
+
+    int number_of_blocks = pool_size_in_bytes / CHUNKSIZE;
+    void *block_pointer = arena.chunkpool;
+    for (int block_index = 0; block_index < number_of_blocks; block_index++)
+    {
+        *(void **)block_pointer = (char *)block_pointer + 96;
+        block_pointer = (char *)block_pointer + 96;
+    }
 }
 
 /// @brief Verifies if pool header is null
