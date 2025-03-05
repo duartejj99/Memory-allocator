@@ -11,7 +11,7 @@
 
 bool is_pool_empty(void *pool);
 void initialize_pool();
-void *poll(void *head);
+void *poll(void **head_ref);
 
 void *
 emalloc_small(unsigned long size)
@@ -22,17 +22,18 @@ emalloc_small(unsigned long size)
         initialize_pool(arena.chunkpool);
     }
 
-    void *user_zone = poll(arena.chunkpool);
+    void *user_zone = poll(&arena.chunkpool);
 
     return (void *)user_zone;
 }
 
-void *poll(void *head)
+void *poll(void **head_ref)
 {
     void *user_zone;
-    void *next_element = *(void **)head;
+    void *head = *head_ref;              // here I have value stored on HEAD
+    void *next_element = *(void **)head; // The value stored on HEAD is a pointer, I read the value stored on that REF, which is the next element
     user_zone = mark_memarea_and_get_user_ptr(head, CHUNKSIZE, SMALL_KIND);
-    head = next_element;
+    *head_ref = next_element;
 
     return user_zone;
 }
@@ -67,5 +68,5 @@ void initialize_pool()
 /// @return
 bool is_pool_empty(void *pool)
 {
-    return *(void **)pool == 0;
+    return pool == 0;
 }
