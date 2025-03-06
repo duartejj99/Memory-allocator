@@ -10,13 +10,21 @@
 #include "mem_internals.h"
 #include <bits/mman-linux.h>
 
+/// @brief Random number generator based on knuth mmix
+/// @param in Memory address used as seed
+/// @return Random number
 unsigned long knuth_mmix_one_round(unsigned long in)
 {
     return in * 6364136223846793005UL % 1442695040888963407UL;
 }
 
-// unsigned long calculate_magic_number(unsigned long )
-
+/// @brief Marks the memory block pointed by ptr with its meta-information
+/// such as its size and memory kind, as well as a magic number to detect
+/// memory overflows
+/// @param ptr Memory block pointer
+/// @param size Memory block size in bytes, it takes in count the meta-information size as well
+/// @param k Memory block kind
+/// @return
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
     // ->[SIZE][MAGIC NUM]-- [USER MEMORY]--[MAGIC NUM][SIZE]
@@ -32,6 +40,10 @@ void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
     return (void *)((unsigned long *)ptr + 2);
 }
 
+/// @brief Verifies memory block integrity by checking its magic number and size markers,
+/// as well as obtaining the block meta-information.
+/// @param ptr Memory block pointer referencing the begin of its user zone
+/// @return Returns an Alloc struct with the memory block meta-information
 Alloc mark_check_and_get_alloc(void *ptr)
 {
     void *block_ptr = ptr - 16;
