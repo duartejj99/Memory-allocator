@@ -38,12 +38,16 @@ void *poll(void **head_ref)
     return user_zone;
 }
 
+/// @brief Receives a freed memory block back from user
+/// and add first into the head of the memory pool.
+/// @param a is a data struct which contains meta information about
+/// the received memory block
 void efree_small(Alloc a)
 {
-    // verify it is CHUNK_SIZE and SMALL ALLOC
+    assert(a.size == CHUNKSIZE);
 
-    // add block to the linked list
-    assert("Not yet implemented :(");
+    *(void **)a.ptr = arena.chunkpool;
+    arena.chunkpool = a.ptr;
 }
 
 /// @brief Initialize a memory pool, transforming it into a linked list
