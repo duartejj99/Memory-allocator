@@ -13,6 +13,9 @@ bool is_pool_empty(void *pool);
 void initialize_pool();
 void *poll(void **head_ref);
 
+/// @brief Allocates a small memory block, removing it from the pool.
+/// @param size is the size of the allocated block, always CHUNKSIZE
+/// @return Gives back the user zone pointer of the allocated memory block
 void *
 emalloc_small(unsigned long size)
 {
@@ -27,6 +30,9 @@ emalloc_small(unsigned long size)
     return (void *)user_zone;
 }
 
+/// @brief Removes and returns the memory block from the linked list pointed by pool HEAD
+/// @param head_ref is the HEAD reference, allowing to modify HEAD.
+/// @return The user zone pointer on the returned memory block.
 void *poll(void **head_ref)
 {
     void *user_zone;
