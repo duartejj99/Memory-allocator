@@ -63,7 +63,7 @@ endif(EXISTS /usr/include/python3.12/Python.h)
 # Si vous utilisé plusieurs fichiers, en plus de mem.c et les autres,
 # pour votre allocateur il faut les ajouter ici
 ##
-add_library(emalloc SHARED src/mem.c src/mem_internals.c src/mem_small.c src/mem_medium.c src/mem_large.c)
+add_library(emalloc SHARED src/linked_list.c src/mem.c src/mem_internals.c src/mem_small.c src/mem_medium.c src/mem_large.c)
 
 ##
 # Bibliothèque pour faire des tests en python
@@ -75,7 +75,7 @@ target_link_libraries(mempy emalloc)
 ##
 # Construction du programme de tests unitaires
 ##
-add_executable(alloctest tests/alloctest.cc tests/test_mark.cc tests/test_generic.cc tests/test_buddy.cc tests/test_run_cpp.cc)
+add_executable(alloctest tests/test_linked_list.cc tests/alloctest.cc tests/test_mark.cc tests/test_generic.cc tests/test_buddy.cc tests/test_run_cpp.cc)
 target_link_libraries(alloctest gtest gtest_main emalloc)
 add_test(AllTestsAllocator alloctest)
 
