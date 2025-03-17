@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <assert.h>
+#include <stdio.h>
 // should I make a struct?
 //  I don't think so, there is no an object to retain
 //  but rather just memory
@@ -27,7 +28,7 @@ void *create_linked_list(void **memory_block, unsigned long memory_length, unsig
 
 /// @brief Removes and returns the memory block from the linked list pointed by pool HEAD
 /// @param head_ref is the HEAD reference, allowing to modify HEAD.
-/// @return The user zone pointer on the returned memory block.
+/// @return The new head value.
 void *generic_poll(void **head_ref)
 {
     assert(*head_ref != NULL);
@@ -35,7 +36,6 @@ void *generic_poll(void **head_ref)
     void *old_head = *head_ref;              // here I have value stored on HEAD
     void *next_element = *(void **)old_head; // The value stored on HEAD is a pointer, I read the value stored on that REF, which is the next element
     *head_ref = next_element;
-
     return old_head;
 }
 
