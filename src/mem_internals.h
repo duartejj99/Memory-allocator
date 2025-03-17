@@ -79,6 +79,8 @@ extern "C"
     void efree_medium(Alloc a);
     void efree_large(Alloc a);
 
+    void *poll(void **head_ref);
+
 #ifdef __cplusplus
 }
 #endif

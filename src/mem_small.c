@@ -11,7 +11,6 @@
 
 bool is_pool_empty(void *pool);
 void initialize_pool();
-void *poll(void **head_ref);
 
 /// @brief Allocates a small memory block, removing it from the pool.
 /// @param size is the size of the allocated block, always CHUNKSIZE
@@ -35,6 +34,8 @@ emalloc_small(unsigned long size)
 /// @return The user zone pointer on the returned memory block.
 void *poll(void **head_ref)
 {
+    assert(head_ref != NULL);
+
     void *user_zone;
     void *head = *head_ref;              // here I have value stored on HEAD
     void *next_element = *(void **)head; // The value stored on HEAD is a pointer, I read the value stored on that REF, which is the next element
@@ -57,7 +58,7 @@ void efree_small(Alloc a)
 }
 
 /// @brief Initialize a memory pool, transforming it into a linked list
-/// which head pointed by the arena.chunkpool pointer
+/// of chunks of CHUNKSIZE size. The linked list's head is pointed by arena.chunkpool
 void initialize_pool()
 {
 
@@ -73,6 +74,7 @@ void initialize_pool()
     }
 }
 
+/// linked_list function
 /// @brief Verifies if pool header is null
 /// @param pool: Linked list head
 /// @return
