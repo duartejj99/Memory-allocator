@@ -58,7 +58,7 @@ emalloc_medium(unsigned long size)
         fragment_block(big_block, fragment_size);
     }
 
-    allocated_block = generic_poll(&arena.TZL[tzl_index]);
+    allocated_block = poll(&arena.TZL[tzl_index]);
     void *user_ptr = mark_memarea_and_get_user_ptr(allocated_block, 1 << tzl_index, MEDIUM_KIND);
 
     return user_ptr;
@@ -81,9 +81,9 @@ void fragment_block(void *block, unsigned long fragment_size)
         block_size = 1 << block_to_cut_index;
         binary_fragment_size = block_size >> 1;
 
-        arena.TZL[block_to_cut_index - 1] = generic_poll(head);
-        block_to_cut_index -= 1;
-        create_linked_list(arena.TZL[block_to_cut_index], block_size, binary_fragment_size);
+        arena.TZL[block_to_cut_index - 1] = poll(head);
+        block_to_cut_index--;
+        new_linked_list(arena.TZL[block_to_cut_index], block_size, binary_fragment_size);
         head = &arena.TZL[block_to_cut_index];
     }
 }

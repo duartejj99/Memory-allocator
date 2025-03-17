@@ -23,7 +23,7 @@ TEST(General, linked_list)
                             MAP_PRIVATE | MAP_ANONYMOUS,
                             -1,
                             0);
-  void *head = create_linked_list((void **)memory_block, size, element_size);
+  void *head = new_linked_list((void **)memory_block, size, element_size);
   // Act
   unsigned long length = linked_list_length(head);
   // Verify # of elements on linked list
@@ -43,12 +43,12 @@ TEST(General, poll)
                             MAP_PRIVATE | MAP_ANONYMOUS,
                             -1,
                             0);
-  void *head = create_linked_list((void **)memory_block, size, element_size);
+  void *head = new_linked_list((void **)memory_block, size, element_size);
   // Act
   unsigned long length = linked_list_length(head);
   for (unsigned long i = 0; i < length; i++)
   {
-    generic_poll(&head);
+    poll(&head);
   }
   // Assert
   ASSERT_EQ(head, (void *)NULL);

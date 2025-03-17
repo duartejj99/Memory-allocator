@@ -1,12 +1,15 @@
 #include <stddef.h>
 #include <assert.h>
 #include <stdio.h>
-// should I make a struct?
-//  I don't think so, there is no an object to retain
-//  but rather just memory
+#include <stdbool.h>
 
-// In bytes
-void *create_linked_list(void **memory_block, unsigned long memory_length, unsigned long element_length)
+/// @brief Creates a new linked list of memory chunks of size element_length from a memory block
+/// of size memory_length, pointed by memory_block
+/// @param memory_block The reference pointing to the memory block to divide into chunks
+/// @param memory_length The memory block total size in bytes
+/// @param element_length The size of each element/chunk in bytes
+/// @return The linked list's head
+void *new_linked_list(void **memory_block, unsigned long memory_length, unsigned long element_length)
 {
     assert(memory_length % element_length == 0);
     void *head = memory_block;
@@ -29,7 +32,7 @@ void *create_linked_list(void **memory_block, unsigned long memory_length, unsig
 /// @brief Removes and returns the memory block from the linked list pointed by pool HEAD
 /// @param head_ref is the HEAD reference, allowing to modify HEAD.
 /// @return The new head value.
-void *generic_poll(void **head_ref)
+void *poll(void **head_ref)
 {
     assert(*head_ref != NULL);
 
@@ -39,10 +42,17 @@ void *generic_poll(void **head_ref)
     return old_head;
 }
 
-void is_empty() {
-
+/// @brief Verifies if the linked list is empty
+/// @param head The linked list's head
+/// @return True if the linked list is empty, false if it isn't
+bool is_linked_list_empty(void *head)
+{
+    return head == NULL;
 };
 
+/// @brief Calculates the number of elements on the linked list
+/// @param head The linked list's head
+/// @return The number of elements on the linked list
 unsigned long linked_list_length(void *head)
 {
     void **iterator = head;
