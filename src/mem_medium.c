@@ -11,10 +11,9 @@
 #include "mem_internals.h"
 #include "linked_list.h"
 
-int bigger_linked_list_blocks_exists(int i);
-bool is_free_zone_pool_empty(unsigned int tzl_index);
+bool bigger_pool_exists(unsigned int i);
 void fragment_block(void *block, unsigned long fragment_size);
-void *search_next_bigger_block(unsigned int tzl_index);
+void *find_next_bigger_pool(unsigned int tzl_index);
 
 unsigned int puiss2(unsigned long size)
 {
@@ -30,7 +29,11 @@ unsigned int puiss2(unsigned long size)
     return p;
 }
 
-// TODO -> DO CLEAN CODE
+/// @brief Allocates a medium memory block, removing it from a pool on the Free zone array
+/// (TZL on original french).
+/// @param size is the size of the demanded block.
+/// @warning Medium allocations allocates a block length equals to the closest power of two bigger than size.
+/// @return Gives back the user zone pointer to the allocated memory block
 void *
 emalloc_medium(unsigned long size)
 {
@@ -39,15 +42,10 @@ emalloc_medium(unsigned long size)
 
     unsigned int tzl_index = puiss2(size);
     void *allocated_block = NULL;
-    // Is block available at my ORIGINAL INDEX?
-    // -> yes -> poll
-    // Is bigger block available ?
-    //  -> yes -> fragment and poll
-    // -> no -> realloc and fragment and poll
 
-    if (is_free_zone_pool_empty(tzl_index))
+    if (is_pool_empty(arena.TZL[tzl_index]))
     {
-        void *big_block = search_next_bigger_block(tzl_index);
+        void *big_block = find_next_bigger_pool(tzl_index);
 
         if (big_block == NULL)
         {
@@ -63,7 +61,9 @@ emalloc_medium(unsigned long size)
 
     return user_ptr;
 }
-
+/// @brief Realizes a binary fragmentation on a memory block until obtaining a memory chunk of size fragment_size
+/// @param block the pointer of the memory block to fragment
+/// @param fragment_size the memory chunk length
 void fragment_block(void *block, unsigned long fragment_size)
 {
     unsigned int block_to_cut_index = FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1;
@@ -88,11 +88,16 @@ void fragment_block(void *block, unsigned long fragment_size)
     }
 }
 
-void *search_next_bigger_block(unsigned int tzl_index)
+/// @brief Finds the next bigger pool with available free zones after
+/// the pool on the Free zone array index passed as parameter
+/// @param tzl_index
+/// @return Returns the index of the next available pool, if any.
+/// @warning Returns NULL if there are no bigger pools available
+void *find_next_bigger_pool(unsigned int tzl_index)
 {
-    while (bigger_linked_list_blocks_exists(tzl_index))
+    while (bigger_pool_exists(tzl_index))
     {
-        if (!is_free_zone_pool_empty(tzl_index))
+        if (!is_pool_empty(arena.TZL[tzl_index]))
         {
             return arena.TZL[tzl_index];
         }
@@ -102,15 +107,13 @@ void *search_next_bigger_block(unsigned int tzl_index)
     return NULL;
 }
 
-int bigger_linked_list_blocks_exists(int i)
+/// @brief Verifies if there still are bigger pools on the Free zone array than
+/// a reference pool signalated by index i
+/// @param i is the reference pool index
+/// @return True if there are still bigger pools to check after the reference pool
+bool bigger_pool_exists(unsigned int i)
 {
     return i < FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant;
-}
-
-// Linked list function
-bool is_free_zone_pool_empty(unsigned int tzl_index)
-{
-    return arena.TZL[tzl_index] == NULL;
 }
 
 void efree_medium(Alloc a)
