@@ -10,19 +10,18 @@
 #include "mem_internals.h"
 #include "linked_list.h"
 
-bool is_pool_empty(void *pool);
-void initialize_pool();
+void initialize_small_chunks_pool();
 
 /// @brief Allocates a small memory block, removing it from the pool.
 /// @param size is the size of the allocated block, always CHUNKSIZE
-/// @return Gives back the user zone pointer of the allocated memory block
+/// @return Gives back the user zone pointer to the allocated memory block
 void *
 emalloc_small(unsigned long size)
 {
 
     if (is_pool_empty(arena.chunkpool))
     {
-        initialize_pool(arena.chunkpool);
+        initialize_small_chunks_pool(arena.chunkpool);
     }
 
     void *chunk = poll(&arena.chunkpool);

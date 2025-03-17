@@ -14,6 +14,7 @@ extern "C"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define handle_fatalError(msg)             \
     do                                     \
@@ -80,6 +81,7 @@ extern "C"
     void efree_large(Alloc a);
 
     void *poll(void **head_ref);
+    bool is_pool_empty(void *pool);
 
 #ifdef __cplusplus
 }
