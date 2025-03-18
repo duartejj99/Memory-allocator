@@ -11,9 +11,15 @@
 #include "mem_internals.h"
 #include "linked_list.h"
 
+struct MemoryPool
+{
+    void *ptr;
+    unsigned long size;
+};
+
 bool bigger_pool_exists(unsigned int i);
-void fragment_block(void *block, unsigned long fragment_size);
-void *find_next_bigger_pool(unsigned int tzl_index);
+void fragment_block(struct MemoryPool block, unsigned long fragment_size);
+struct MemoryPool find_next_bigger_pool(unsigned int tzl_index);
 
 unsigned int puiss2(unsigned long size)
 {
@@ -41,19 +47,19 @@ emalloc_medium(unsigned long size)
     assert(size > SMALLALLOC);
 
     unsigned int tzl_index = puiss2(size);
-    void *allocated_block = NULL;
+    void *allocated_block;
 
     if (is_pool_empty(arena.TZL[tzl_index]))
     {
-        void *big_block = find_next_bigger_pool(tzl_index);
+        struct MemoryPool pool = find_next_bigger_pool(tzl_index);
 
-        if (big_block == NULL)
+        if (pool.ptr == NULL)
         {
-            mem_realloc_medium();
-            big_block = arena.TZL[FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1];
+            pool.size = mem_realloc_medium();
+            pool.ptr = arena.TZL[FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1];
         }
         unsigned long fragment_size = 1 << tzl_index;
-        fragment_block(big_block, fragment_size);
+        fragment_block(pool, fragment_size);
     }
 
     allocated_block = poll(&arena.TZL[tzl_index]);
@@ -64,13 +70,13 @@ emalloc_medium(unsigned long size)
 /// @brief Realizes a binary fragmentation on a memory block until obtaining a memory chunk of size fragment_size
 /// @param block the pointer of the memory block to fragment
 /// @param fragment_size the memory chunk length
-void fragment_block(void *block, unsigned long fragment_size)
+void fragment_block(struct MemoryPool block, unsigned long fragment_size)
 {
-    unsigned int block_to_cut_index = FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1;
-    unsigned long block_size = 1 << block_to_cut_index;
+    unsigned int block_to_cut_index = puiss2(block.size);
+    unsigned long block_size = block.size;
     unsigned long binary_fragment_size;
 
-    assert(block != NULL);
+    assert(block.ptr != NULL);
     assert((block_size % fragment_size) == 0); // THIS IS ALWAYS TRUE, should this function receives block_size?
 
     unsigned int index = puiss2(fragment_size);
@@ -93,18 +99,22 @@ void fragment_block(void *block, unsigned long fragment_size)
 /// @param tzl_index
 /// @return Returns the index of the next available pool, if any.
 /// @warning Returns NULL if there are no bigger pools available
-void *find_next_bigger_pool(unsigned int tzl_index)
+struct MemoryPool find_next_bigger_pool(unsigned int tzl_index)
 {
+    struct MemoryPool pool = {NULL, 0};
     while (bigger_pool_exists(tzl_index))
     {
         if (!is_pool_empty(arena.TZL[tzl_index]))
         {
-            return arena.TZL[tzl_index];
+            pool.ptr = arena.TZL[tzl_index];
+            pool.size = 1 << tzl_index;
+
+            return pool;
         }
         tzl_index++;
     }
 
-    return NULL;
+    return pool;
 }
 
 /// @brief Verifies if there still are bigger pools on the Free zone array than
