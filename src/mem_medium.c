@@ -11,15 +11,16 @@
 #include "mem_internals.h"
 #include "linked_list.h"
 
-struct MemoryPool
+struct MemoryBlock
 {
     void *ptr;
     unsigned long size;
 };
+const struct MemoryBlock NULLMEMORYBLOCK = {NULL, 0};
 
-bool bigger_pool_exists(unsigned int i);
-void fragment_block(struct MemoryPool block, unsigned long fragment_size);
-struct MemoryPool find_next_bigger_pool(unsigned int tzl_index);
+bool bigger_pool_exists(unsigned int pool_index);
+void fragment_block(struct MemoryBlock block, unsigned long fragment_size);
+struct MemoryBlock find_next_bigger_block(unsigned int pool_index);
 
 unsigned int puiss2(unsigned long size)
 {
@@ -46,31 +47,31 @@ emalloc_medium(unsigned long size)
     assert(size < LARGEALLOC);
     assert(size > SMALLALLOC);
 
-    unsigned int tzl_index = puiss2(size);
+    unsigned int pool_index = puiss2(size);
     void *allocated_block;
 
-    if (is_pool_empty(arena.TZL[tzl_index]))
+    if (is_pool_empty(arena.TZL[pool_index]))
     {
-        struct MemoryPool pool = find_next_bigger_pool(tzl_index);
+        struct MemoryBlock block = find_next_bigger_block(pool_index);
 
-        if (pool.ptr == NULL)
+        if (block.ptr == NULL)
         {
-            pool.size = mem_realloc_medium();
-            pool.ptr = arena.TZL[FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1];
+            block.size = mem_realloc_medium();
+            block.ptr = arena.TZL[FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1];
         }
-        unsigned long fragment_size = 1 << tzl_index;
-        fragment_block(pool, fragment_size);
+        unsigned long fragment_size = 1 << pool_index;
+        fragment_block(block, fragment_size);
     }
 
-    allocated_block = poll(&arena.TZL[tzl_index]);
-    void *user_ptr = mark_memarea_and_get_user_ptr(allocated_block, 1 << tzl_index, MEDIUM_KIND);
+    allocated_block = poll(&arena.TZL[pool_index]);
+    void *user_ptr = mark_memarea_and_get_user_ptr(allocated_block, 1 << pool_index, MEDIUM_KIND);
 
     return user_ptr;
 }
 /// @brief Realizes a binary fragmentation on a memory block until obtaining a memory chunk of size fragment_size
 /// @param block the pointer of the memory block to fragment
 /// @param fragment_size the memory chunk length
-void fragment_block(struct MemoryPool block, unsigned long fragment_size)
+void fragment_block(struct MemoryBlock block, unsigned long fragment_size)
 {
     unsigned int block_to_cut_index = puiss2(block.size);
     unsigned long block_size = block.size;
@@ -94,39 +95,46 @@ void fragment_block(struct MemoryPool block, unsigned long fragment_size)
     }
 }
 
-/// @brief Finds the next bigger pool with available free zones after
-/// the pool on the Free zone array index passed as parameter
-/// @param tzl_index
+/// @brief Finds the next memory block, bigger than size, available on the array of free zone pools.
+///
+/// It iterates the array from the pool of the memory blocks with the minimum required size
+/// until finding a pool with an available block
+/// @param size The size of the memory block searched
 /// @return Returns the index of the next available pool, if any.
-/// @warning Returns NULL if there are no bigger pools available
-struct MemoryPool find_next_bigger_pool(unsigned int tzl_index)
+/// @warning Returns NULLMEMORYBLOCK if there are no bigger blocks available on any pool
+struct MemoryBlock find_next_bigger_block(unsigned int size)
 {
-    struct MemoryPool pool = {NULL, 0};
-    while (bigger_pool_exists(tzl_index))
+    unsigned int pool_index = puiss2(size);
+
+    struct MemoryBlock pool = NULLMEMORYBLOCK;
+    while (bigger_pool_exists(pool_index))
     {
-        if (!is_pool_empty(arena.TZL[tzl_index]))
+        if (!is_pool_empty(arena.TZL[pool_index]))
         {
-            pool.ptr = arena.TZL[tzl_index];
-            pool.size = 1 << tzl_index;
+            pool.ptr = arena.TZL[pool_index];
+            pool.size = 1 << pool_index;
 
             return pool;
         }
-        tzl_index++;
+        pool_index++;
     }
 
     return pool;
 }
 
 /// @brief Verifies if there still are bigger pools on the Free zone array than
-/// a reference pool signalated by index i
-/// @param i is the reference pool index
+/// a reference pool signalated by index pool_index
+/// @param pool_index is the reference pool index
 /// @return True if there are still bigger pools to check after the reference pool
-bool bigger_pool_exists(unsigned int i)
+bool bigger_pool_exists(unsigned int pool_index)
 {
-    return i < FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant;
+    return pool_index < FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant;
 }
 
 void efree_medium(Alloc a)
 {
-    /* ecrire votre code ici */
+
+    // 1.Buddy check
+    // 2. IF body is found, fusion, else go back to the linked list (PUSH)
+    // 3. IF fusion result has a buddy goto Step 1.
 }
