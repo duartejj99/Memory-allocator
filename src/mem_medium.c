@@ -18,9 +18,14 @@ struct MemoryBlock
 };
 const struct MemoryBlock NULLMEMORYBLOCK = {NULL, 0};
 
+// malloc related
 bool bigger_pool_exists(unsigned int pool_index);
 void fragment_block(struct MemoryBlock block, unsigned long fragment_size);
 struct MemoryBlock find_next_bigger_block(unsigned int pool_index);
+
+// free related
+struct MemoryBlock buddy_check(struct MemoryBlock block);
+struct MemoryBlock fusion_blocks(struct MemoryBlock block, struct MemoryBlock buddy);
 
 unsigned int puiss2(unsigned long size)
 {
@@ -68,6 +73,7 @@ emalloc_medium(unsigned long size)
 
     return user_ptr;
 }
+
 /// @brief Realizes a binary fragmentation on a memory block until obtaining a memory chunk of size fragment_size
 /// @param block the pointer of the memory block to fragment
 /// @param fragment_size the memory chunk length
@@ -133,8 +139,69 @@ bool bigger_pool_exists(unsigned int pool_index)
 
 void efree_medium(Alloc a)
 {
+    assert(a.kind == MEDIUM_KIND);
+    assert(a.ptr != NULL);
+    assert(a.size > SMALLALLOC);
+    assert(a.size < LARGEALLOC);
 
     // 1.Buddy check
-    // 2. IF body is found, fusion, else go back to the linked list (PUSH)
+    // 2. IF buddy is found, fusion, else go back to the linked list (PUSH)
     // 3. IF fusion result has a buddy goto Step 1.
+
+    struct MemoryBlock block, buddy;
+
+    buddy = buddy_check(block);
+    while (buddy.ptr != NULL)
+    {
+        block = fusion_blocks(block, buddy);
+        buddy = buddy_check(block);
+    }
+
+    push(block);
+}
+
+//  should this function remove and retrieve the block from the pool?
+
+/// @brief Check if the memory block passed as parameter has
+/// its buddy block on the Free zone array
+/// @param block A memory block
+/// @return If the buddy is present sends its block info,
+/// otherwise sends NULLMEMORYBLOCK.
+struct MemoryBlock buddy_check(struct MemoryBlock block)
+{
+    // calculate  buddy address
+    // check if a block with this address is available on the good pool
+    // Return Memory block
+    void *buddy_address = (void *)((unsigned long)block.ptr ^ block.size);
+    unsigned int pool_index = puiss2(block.size);
+    struct MemoryBlock buddy;
+    bool buddy_is_present = contains(arena.TZL[pool_index], buddy_address);
+
+    if (!buddy_is_present)
+    {
+        return NULLMEMORYBLOCK;
+    }
+
+    buddy.ptr = buddy_address;
+    buddy.size = block.size;
+
+    return buddy;
+}
+/// @brief Fusion two adjacents memory blocks forming a block twice the size,
+/// and polling the buddy block in the process
+/// @param block a memory block
+/// @param buddy an adjacent memory block
+/// @warning The buddy block is polled from its pool
+/// @return The fusionned block
+struct MemoryBlock fusion_blocks(struct MemoryBlock block, struct MemoryBlock buddy)
+{
+    unsigned int pool_index = puiss2(block.size);
+    void **pool_head = &arena.TZL[pool_index];
+    void *buddy_block = remove_element(pool_head, buddy.ptr);
+
+    // Remove block whether is at the beginning, the middle or the end;
+    // Build a Memory block with the new size and the new pointer
+    // At the end of this function, the block is not attached at any pool
+    return NULLMEMORYBLOCK;
+    // calculate
 }
