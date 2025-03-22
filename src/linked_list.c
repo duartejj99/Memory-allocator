@@ -55,6 +55,8 @@ bool is_linked_list_empty(void *head)
 /// @return The number of elements on the linked list
 unsigned long linked_list_length(void *head)
 {
+    assert(head != NULL);
+
     void **iterator = head;
     unsigned long length = 1; // counting the one pointed by head
     while (*iterator != NULL)
@@ -64,4 +66,68 @@ unsigned long linked_list_length(void *head)
     }
 
     return length;
+}
+
+/// @brief Verifies if the element is on the Linked list
+/// @param head The linked list head
+/// @param element The element to look for
+/// @return Returns true if it's on the linked list, false if not
+bool contains(void *head, void *element)
+{
+    assert(head != NULL);
+    assert(element != NULL);
+
+    void **iterator = head;
+
+    do
+    {
+        if (iterator == element)
+        {
+            return true;
+        }
+        iterator = *(void **)iterator;
+
+    } while (*iterator != NULL);
+
+    return false;
+}
+
+// Expects &head and not head
+// could be null if element is not present
+
+/// @brief Remove an element from the linked list
+/// @param head_ref The linked list's head reference, because head may be changed
+/// @param element The element to remove
+/// @return The removed element pointer
+void *remove_element(void **head_ref, void *element)
+{
+    assert(head_ref != NULL);
+    assert(*head_ref != NULL); // HEAD
+    assert(element != NULL);
+
+    void **iterator = *head_ref;
+
+    // Special case
+    // First element case (We have to change head)
+    if (iterator == element)
+    {
+        *head_ref = *iterator;
+        return iterator;
+    }
+
+    // Other elements
+    while (*iterator != NULL) // Is the next block null? I already know the actual one is not the element
+    {
+        // the next block is the element
+        if (*iterator == element)
+        {
+            //  point to the 1st block after element
+            *iterator = *(void **)element;
+            //  return removed
+            return element;
+        }
+        iterator = *(void **)iterator; // iteration advance one block
+    }
+
+    return NULL;
 }
