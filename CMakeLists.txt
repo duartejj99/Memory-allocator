@@ -75,7 +75,7 @@ target_link_libraries(mempy emalloc)
 ##
 # Construction du programme de tests unitaires
 ##
-add_executable(alloctest tests/test_linked_list.cc tests/alloctest.cc tests/test_mark.cc tests/test_generic.cc tests/test_buddy.cc tests/test_run_cpp.cc)
+add_executable(alloctest tests/test_linked_list.cc tests/test_pool_array.cc tests/alloctest.cc tests/test_mark.cc tests/test_generic.cc tests/test_buddy.cc tests/test_run_cpp.cc)
 target_link_libraries(alloctest gtest gtest_main emalloc)
 add_test(AllTestsAllocator alloctest)
 

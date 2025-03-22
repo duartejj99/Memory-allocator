@@ -10,17 +10,12 @@
 #include "mem.h"
 #include "mem_internals.h"
 #include "linked_list.h"
+#include "mem_medium.h"
 
-struct MemoryBlock
-{
-    void *ptr;
-    unsigned long size;
-};
 const struct MemoryBlock NULLMEMORYBLOCK = {NULL, 0};
 
 // malloc related
 bool bigger_pool_exists(unsigned int pool_index);
-void fragment_block(struct MemoryBlock block, unsigned long fragment_size);
 struct MemoryBlock find_next_bigger_block(unsigned int pool_index);
 
 // free related
@@ -65,7 +60,7 @@ emalloc_medium(unsigned long size)
             block.ptr = arena.TZL[FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant - 1];
         }
         unsigned long fragment_size = 1 << pool_index;
-        fragment_block(block, fragment_size);
+        fragment_block(&arena, block, fragment_size);
     }
 
     allocated_block = poll(&arena.TZL[pool_index]);
@@ -77,27 +72,28 @@ emalloc_medium(unsigned long size)
 /// @brief Realizes a binary fragmentation on a memory block until obtaining a memory chunk of size fragment_size
 /// @param block the pointer of the memory block to fragment
 /// @param fragment_size the memory chunk length
-void fragment_block(struct MemoryBlock block, unsigned long fragment_size)
+void fragment_block(MemArena *arena, struct MemoryBlock block, unsigned long fragment_size)
 {
     unsigned int block_to_cut_index = puiss2(block.size);
     unsigned long block_size = block.size;
     unsigned long binary_fragment_size;
 
     assert(block.ptr != NULL);
+    assert(block.ptr == arena->TZL[block_to_cut_index]);
     assert((block_size % fragment_size) == 0); // THIS IS ALWAYS TRUE, should this function receives block_size?
 
     unsigned int index = puiss2(fragment_size);
-    void *head = &arena.TZL[block_to_cut_index];
+    void *head_ref = &arena->TZL[block_to_cut_index];
 
-    while (arena.TZL[index] == NULL && index < block_to_cut_index)
+    while (arena->TZL[index] == NULL && index < block_to_cut_index)
     {
         block_size = 1 << block_to_cut_index;
         binary_fragment_size = block_size >> 1;
 
-        arena.TZL[block_to_cut_index - 1] = poll(head);
+        arena->TZL[block_to_cut_index - 1] = poll(head_ref);
         block_to_cut_index--;
-        new_linked_list(arena.TZL[block_to_cut_index], block_size, binary_fragment_size);
-        head = &arena.TZL[block_to_cut_index];
+        new_linked_list(arena->TZL[block_to_cut_index], block_size, binary_fragment_size);
+        head_ref = &arena->TZL[block_to_cut_index];
     }
 }
 
