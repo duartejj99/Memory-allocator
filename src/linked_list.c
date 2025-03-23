@@ -79,21 +79,17 @@ bool contains(void *head, void *element)
 
     void **iterator = head;
 
-    do
+    while (iterator != NULL)
     {
         if (iterator == element)
         {
             return true;
         }
         iterator = *(void **)iterator;
-
-    } while (*iterator != NULL);
+    }
 
     return false;
 }
-
-// Expects &head and not head
-// could be null if element is not present
 
 /// @brief Remove an element from the linked list
 /// @param head_ref The linked list's head reference, because head may be changed
