@@ -146,6 +146,10 @@ void efree_medium(Alloc a)
 
     struct MemoryBlock block, buddy;
 
+    block.ptr = a.ptr;
+    block.size = a.size;
+
+    // optimized using only removing and fusion block
     buddy = buddy_check(block);
     while (buddy.ptr != NULL)
     {
@@ -153,7 +157,9 @@ void efree_medium(Alloc a)
         buddy = buddy_check(block);
     }
 
-    push(block);
+    unsigned int pool_index = puiss2(block.size);
+    void *pool_head = &arena.TZL[pool_index];
+    push(pool_head, block.ptr);
 }
 
 //  should this function remove and retrieve the block from the pool?

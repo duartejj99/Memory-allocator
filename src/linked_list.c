@@ -98,7 +98,7 @@ bool contains(void *head, void *element)
 /// @brief Remove an element from the linked list
 /// @param head_ref The linked list's head reference, because head may be changed
 /// @param element The element to remove
-/// @return The removed element pointer
+/// @return The removed element pointer, or Null if the element was not present
 void *remove_element(void **head_ref, void *element)
 {
     assert(head_ref != NULL);
@@ -130,4 +130,17 @@ void *remove_element(void **head_ref, void *element)
     }
 
     return NULL;
+}
+
+/// @brief Push a block onto the linked list head
+/// @param head_ref Linked list head reference
+/// @param element The element to push.
+/// @warning Fails if either the head_ref or the element are NULL
+void push(void **head_ref, void *element)
+{
+    assert(head_ref != NULL);
+    assert(element != NULL);
+
+    *(void **)element = *head_ref;
+    *head_ref = element;
 }

@@ -10,6 +10,7 @@ extern "C"
     unsigned long linked_list_length(void *head);
     void *remove_element(void *head, void *element);
     bool contains(void *head, void *element);
+    void push(void **head_ref, void *element);
 
 #ifdef __cplusplus
 }
