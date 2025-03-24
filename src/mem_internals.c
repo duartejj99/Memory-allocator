@@ -27,6 +27,8 @@ unsigned long knuth_mmix_one_round(unsigned long in)
 /// @return
 void *mark_memarea_and_get_user_ptr(void *ptr, unsigned long size, MemKind k)
 {
+    assert(ptr != NULL);
+    assert(size != 0);
     // ->[SIZE][MAGIC NUM]-- [USER MEMORY]--[MAGIC NUM][SIZE]
     //  8o 8o user mem 8o 8o
     unsigned long mmix = knuth_mmix_one_round((unsigned long)ptr);
@@ -59,7 +61,6 @@ Alloc mark_check_and_get_alloc(void *ptr)
 
     MemKind mem_kind = magic_number & 0b11UL;
 
-    printf("Memory size: %lu\n", *(unsigned long *)block_ptr);
     Alloc a = {
         block_ptr,
         mem_kind,
