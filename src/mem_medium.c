@@ -135,16 +135,17 @@ bool bigger_pool_exists(unsigned int pool_index)
     return pool_index < FIRST_ALLOC_MEDIUM_EXPOSANT + arena.medium_next_exponant;
 }
 
+/// @brief Returns back the allocated block pointed by a to the Free zone pool array.
+///
+/// It would check if the buddy is present and fusion the two buddy blocks,
+/// and repeat the process with the fusionned block until is no longer possible
+/// @param a The allocated block meta information to free.
 void efree_medium(Alloc a)
 {
     assert(a.kind == MEDIUM_KIND);
     assert(a.ptr != NULL);
     assert(a.size > SMALLALLOC);
     assert(a.size < LARGEALLOC + 32);
-
-    // 1.Buddy check
-    // 2. IF buddy is found, fusion, else go back to the linked list (PUSH)
-    // 3. IF fusion result has a buddy goto Step 1.
 
     struct MemoryBlock block, buddy;
 
@@ -164,8 +165,6 @@ void efree_medium(Alloc a)
     push(pool_head, block.ptr);
 }
 
-//  should this function remove and retrieve the block from the pool?
-
 /// @brief Check if the memory block passed as parameter has
 /// its buddy block on the Free zone array
 /// @param block A memory block
@@ -173,9 +172,6 @@ void efree_medium(Alloc a)
 /// otherwise sends NULLMEMORYBLOCK.
 struct MemoryBlock buddy_check(struct MemoryBlock block)
 {
-    // calculate  buddy address
-    // check if a block with this address is available on the good pool
-    // Return Memory block
     void *buddy_address = (void *)((unsigned long)block.ptr ^ block.size);
     unsigned int pool_index = puiss2(block.size);
     struct MemoryBlock buddy;
@@ -208,10 +204,9 @@ struct MemoryBlock fusion_blocks(struct MemoryBlock block, struct MemoryBlock bu
     void **pool_head = &arena.TZL[pool_index];
     void *buddy_ptr = remove_element(pool_head, buddy.ptr);
 
-    // Build a Memory block with the new size and the new pointer
     void *fusion_block_ptr = min(buddy_ptr, block.ptr);
     unsigned long size = block.size * 2;
     struct MemoryBlock fusioned_block = {fusion_block_ptr, size};
-    // At the end of this function, the block is not attached at any pool
+
     return fusioned_block;
 }
