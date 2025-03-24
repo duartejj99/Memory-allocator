@@ -53,7 +53,7 @@ emalloc_medium(unsigned long size)
 
     if (is_pool_empty(arena.TZL[pool_index]))
     {
-        struct MemoryBlock block = find_next_bigger_block(pool_index);
+        struct MemoryBlock block = find_next_bigger_block(1 << pool_index);
 
         if (block.ptr == NULL)
         {
