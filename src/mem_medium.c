@@ -47,6 +47,7 @@ emalloc_medium(unsigned long size)
 {
     assert(size < LARGEALLOC);
     assert(size > SMALLALLOC);
+    size = size + 32;
 
     unsigned int pool_index = puiss2(size);
     void *allocated_block;
@@ -139,7 +140,7 @@ void efree_medium(Alloc a)
     assert(a.kind == MEDIUM_KIND);
     assert(a.ptr != NULL);
     assert(a.size > SMALLALLOC);
-    assert(a.size < LARGEALLOC);
+    assert(a.size < LARGEALLOC + 32);
 
     // 1.Buddy check
     // 2. IF buddy is found, fusion, else go back to the linked list (PUSH)
