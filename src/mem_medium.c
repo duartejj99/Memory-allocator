@@ -178,8 +178,12 @@ struct MemoryBlock buddy_check(struct MemoryBlock block)
     void *buddy_address = (void *)((unsigned long)block.ptr ^ block.size);
     unsigned int pool_index = puiss2(block.size);
     struct MemoryBlock buddy;
-    bool buddy_is_present = contains(arena.TZL[pool_index], buddy_address);
 
+    if (arena.TZL[pool_index] == NULL)
+    {
+        return NULLMEMORYBLOCK;
+    }
+    bool buddy_is_present = contains(arena.TZL[pool_index], buddy_address);
     if (!buddy_is_present)
     {
         return NULLMEMORYBLOCK;
