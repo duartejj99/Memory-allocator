@@ -12,6 +12,7 @@
 #include "linked_list.h"
 #include "mem_medium.h"
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
 const struct MemoryBlock NULLMEMORYBLOCK = {NULL, 0};
 
 // malloc related
@@ -193,17 +194,19 @@ struct MemoryBlock buddy_check(struct MemoryBlock block)
 /// and polling the buddy block in the process
 /// @param block a memory block
 /// @param buddy an adjacent memory block
-/// @warning The buddy block is polled from its pool
+/// @warning NOT TO BE USED ALONE: The buddy block is polled from its pool and
+/// the fusion block is not added to another poll
 /// @return The fusionned block
 struct MemoryBlock fusion_blocks(struct MemoryBlock block, struct MemoryBlock buddy)
 {
     unsigned int pool_index = puiss2(block.size);
     void **pool_head = &arena.TZL[pool_index];
-    void *buddy_block = remove_element(pool_head, buddy.ptr);
+    void *buddy_ptr = remove_element(pool_head, buddy.ptr);
 
-    // Remove block whether is at the beginning, the middle or the end;
     // Build a Memory block with the new size and the new pointer
+    void *fusion_block_ptr = min(buddy_ptr, block.ptr);
+    unsigned long size = block.size * 2;
+    struct MemoryBlock fusioned_block = {fusion_block_ptr, size};
     // At the end of this function, the block is not attached at any pool
-    return NULLMEMORYBLOCK;
-    // calculate
+    return fusioned_block;
 }
