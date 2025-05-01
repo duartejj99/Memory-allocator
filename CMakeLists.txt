@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6...3.5)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  endif(COMMAND cmake_policy)
+endif(COMMAND cmake_policy)
   
 cmake_policy(SET CMP0048 NEW)
 project(emalloc VERSION 2.0)
@@ -49,15 +49,21 @@ endif(EXISTS /usr/src/gtest)
 ##
 # Recherche du répertoire avec les headers python
 ##
-if(EXISTS /usr/include/python3.12/Python.h)
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.12")
-elseif(EXISTS /usr/include/python3.6m/Python.h)
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.6m")
-else(EXISTS /usr/include/python3.6m/Python.h)
-  if (EXISTS /usr/include/python3.8/Python.h)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I/usr/include/python3.8")
-  endif (EXISTS /usr/include/python3.8/Python.h)
-endif(EXISTS /usr/include/python3.12/Python.h)
+
+if (EXISTS /usr/include)
+  execute_process(COMMAND find /usr/include -name "Python.h" 
+  OUTPUT_VARIABLE PYTHON_HEADER_PATH 
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  
+  if (PYTHON_HEADER_PATH)
+    get_filename_component(PYTHON_HEADER_FOLDER "${PYTHON_HEADER_PATH}" DIRECTORY)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -I${PYTHON_HEADER_FOLDER}")
+    message("Python.h found at ${PYTHON_HEADER_FOLDER}")
+  else()
+    message(FATAL_ERROR "Python.h not found!")
+  endif(PYTHON_HEADER_PATH)
+endif(EXISTS /usr/include)
+
 
 ##
 # Si vous utilisé plusieurs fichiers, en plus de mem.c et les autres,
