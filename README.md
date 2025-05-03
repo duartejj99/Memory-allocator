@@ -44,7 +44,7 @@ There is an CLI called `memshell` that allows to make calls to the emalloc libra
 If you want to try it, go to the `build` directory and execute
 
 ```bash
-./alloctest
+./memshell
 ```
 
 #### Debug mode
@@ -53,7 +53,7 @@ But, I advice you to run it with the gdb in order to see how the malloc main dat
 For that, on the `build` directory you can run
 
 ```bash
-gdb -- ./alloctest
+gdb -- ./memshell
 ```
 
 ## Warnings

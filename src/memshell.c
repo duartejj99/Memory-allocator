@@ -140,22 +140,22 @@ void used()
  */
 void help()
 {
-	printf("Commandes disponibles :\n");
-	printf("1) init : initialisation ou réinitialisation de l'allocateur\n");
-	printf("2) alloc <taille> : allocation d'un bloc mémoire\n");
-	printf("\tLa taille peut être en décimal ou en héxadécimal (préfixe 0x)\n");
-	printf("\tretour : identificateur de bloc et adresse de départ de la zone\n");
-	printf("3) free <identificateur> : libération d'un bloc\n");
-	printf("4) destroy : libération de l'allocateur\n");
-	printf("4) show : affichage la taille initiale et de l'adresse de départ\n");	
-	printf("5) used : affichage de la liste des blocs occupés\n");
-	printf("\tsous la forme {identificateur, adresse de départ, taille}\n");		
-	printf("6) help : affichage de ce manuel\n");
-	printf("7) exit : quitter le shell\n");
-	
-	printf("\nRemarques :\n");
-	printf("1) Au lancement, le shell appelle mem_init\n");
-	printf("2) Le shell supporte jusqu'à %d allocations entre deux initialisations\n", NB_MAX_ALLOC);			
+	printf("Available commands :\n");
+	printf("1) init : initialize or reinitialize the allocator\n");
+	printf("2) alloc <size> : A memory block allocation\n");
+	printf("\tThe size can be expressed on decimal or hexadecimal format (0x prefix)\n");
+	printf("\treturn : Memory zone's identifier and debut address\n");
+	printf("3) free <identifier> : Block liberation\n");
+	printf("4) destroy : Allocator liberation\n");
+	printf("4) show : Display the initial size and the debut address\n");
+	printf("5) used : Display the allocated block's list\n");
+	printf("\tBy the {identificateur, adresse de départ, size} format\n");
+	printf("6) help : Display this manual\n");
+	printf("7) exit : Quit the shell\n");
+
+	printf("\nRemarks :\n");
+	printf("1) At launch, the shell calls mem_init\n");
+	printf("2) The shell supportS until %d allocations between two initializations\n", NB_MAX_ALLOC);
 }
 
  
@@ -166,10 +166,10 @@ void init()
 {
 
 	int i;
- 
-	printf("**** Mini-shell de test pour l'allocateur mémoire ****\n");
-	printf("\tTapez help pour la liste des commandes\n");
-	
+
+	printf("**** Mini-shell for memory allocator testing ****\n");
+	printf("\tType help for the command list\n");
+
 	id_count = 1;
 	
 	/* initialisation de la table des infos : */
@@ -391,12 +391,12 @@ int main() {
 		switch(cmd) {
 			
 		case INIT:
-				
-			printf("!!! Pas implanté dans ce sujet !!!\n");
+
+			printf("!!! Not yet implemented!!!\n");
 			break;
 			
 		case SHOW:
-		        printf("!!! Pas implanté dans ce sujet !!! Utilisez un débogueur !!!\n"); 
+			printf("!!! Not yet implemented!!! Use a debugger !!!\n");
 			break;
 
 		case USED:
@@ -421,10 +421,9 @@ int main() {
 				}
 			}
 			break;
-				
 
-		case DESTROY: 
-			printf("!!! Pas implanté dans ce sujet !!!\n");
+		case DESTROY:
+			printf("!!! Not yet implemented!!!\n");
 			break;
 
 		case FREE:
