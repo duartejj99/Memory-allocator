@@ -3,7 +3,7 @@
 A dynamic virtual memory allocator realized as an Ensimag project
 from the Concurrent programming and OS [course](https://ensimag.grenoble-inp.fr/fr/formation/syst-egrave-me-d-exploitation-et-programmation-concurrente-4mmseps1).
 
-In this repository you have a memory allocator source code that could replace (**~~Not right now~~**) the classical `malloc` and `free` library functions from the Standard C library
+In this repository you have a memory allocator that could replace (**~~Not right now~~**) the classical `malloc` and `free` library functions from the Standard C library
 
 ## Setup
 
@@ -39,7 +39,7 @@ make check
 
 
 ### Memshell
-There is an CLI called `memshell` that allows to make calls to the emalloc library to test allocation operations manually. For the moment it can only allocate and release memory blocks through an allocator. 
+There is an CLI called `memshell` that uses the emalloc library to do allocation operations through the `alloc` and `free` commands. For the moment it can only realize these two operations through an allocator. 
 
 If you want to try it, go to the `build` directory and execute
 
@@ -56,6 +56,12 @@ For that, on the `build` directory you can run
 gdb -- ./memshell
 ```
 
+
 ## Warnings
 
 It doesn't work yet on x32 machines, only on x64
+
+## References
+
+The malloc uses a buddy memory allocation mechanism for requested memory blocks between 64 bytes and 128 kbytes.
+For more info about this mechanism, check this [wiki](https://en.wikipedia.org/wiki/Buddy_memory_allocation) page
