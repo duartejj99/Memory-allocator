@@ -1,5 +1,5 @@
 /*****************************************************
- * Copyright Juan Garcia 2021-2025                   *
+ * Copyright Juan José Garcia Duarte 2021-2025       *
  * This code is distributed under the GLPv3 licence. *
  * Ce code est distribué sous la licence GPLv3+.     *
  *****************************************************/

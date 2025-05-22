@@ -1,5 +1,5 @@
 /******************************************************
- * Copyright Grégory Mounié 2008-2018                 *
+ * Copyright Juan José García Duarte  2021 - 2025     *
  * This code is distributed under the GLPv3+ licence. *
  * Ce code est distribué sous la licence GPLv3+.      *
  ******************************************************/

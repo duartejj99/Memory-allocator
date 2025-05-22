@@ -1,5 +1,6 @@
 /******************************************************
- * Copyright Grégory Mounié 2018                      *
+ * Copyright Juan Garcia and Grégory Mounié           *
+ *  2018 - 2025                                       *
  * This code is distributed under the GLPv3+ licence. *
  * Ce code est distribué sous la licence GPLv3+.      *
  ******************************************************/
@@ -117,21 +118,4 @@ nb_TZL_entries()
             nb++;
 
     return nb;
-}
-
-void pointer_info()
-{
-    printf("DATA TYPE TESTS \n");
-    printf("========================\n");
-
-    printf("char size: %li\n", sizeof(char));
-    printf("integer size: %li\n", sizeof(int));
-    printf("unsigned long integer size: %li\n", sizeof(unsigned long));
-
-    printf("char size pointer:  %li\n", sizeof(char *));
-    printf("integer size pointer: %li\n", sizeof(int *));
-    printf("unsigned long integer size pointer: %li\n", sizeof(unsigned long *));
-
-    printf("========================\n");
-    printf("DATA TYPE TESTS \n");
 }
